@@ -2,19 +2,17 @@ import { createSlice } from '@reduxjs/toolkit'
 import axios from '~/lib/axios'
 import { generateFormData } from '~/utils/helpers'
 
-// use typeof usersType is you want to use this time
 export const reposType = {
     "data": [
         {
             "id": 0,
-            "email": "",
             "name": "",
-            "image": "",
-            "profile_photo_url": "",
-            "email_verified_at": "",
-            "roles": [
-                "",
-            ]
+            "full_name": "",
+            "html_url": "",
+            "language": "",
+            "updated_at": "",
+            "pushed_at": "",
+            "stargazers_count": 0,
         }
     ],
     "links": {
@@ -73,9 +71,7 @@ export const repos = createSlice({
 export const { setRepos, setIsLoading } = repos.actions
 
 export const fetchRepos = (params?: any) => async (dispatch) => {
-    console.log('fetchrepos');
     await dispatch(setIsLoading(true))
-    // const response = await axios.get(`https://api-test-national-digital.catanchin.com/api/repos`, { params });
     const response = await axios.get(`api/repos`, { params });
     await dispatch(setRepos({ repos: response.data, fresh: params?.fresh }));
     await dispatch(setIsLoading(false))

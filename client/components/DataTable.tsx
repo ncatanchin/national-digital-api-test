@@ -41,13 +41,13 @@ export default function DataTable({
       columns,
       data,
       manualSortBy: true,
-      defaultCanSort: true,
+      defaultCanSort: false,
       autoResetSortBy: false,
     },
     useSortBy,
   );
   const [pageTable, setPageTable] = useQueryParam("page", NumberParam);
-  const [sortBy, setSort] = useQueryParam("sortBy", StringParam);
+  const [sortBy, setSort] = useQueryParam("sort", StringParam);
 
 
   // pagination change control
@@ -56,7 +56,6 @@ export default function DataTable({
   }
 
   // on page change, load new sliced data
-  // here you would make another server request for new data
   useEffect(() => {
     fetchRepos({ pageTable, sortBy });
     // setDataTable(response2.slice((pageTable - 1) * resultsPerPage, pageTable * resultsPerPage))

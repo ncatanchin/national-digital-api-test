@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 import PageTitle from "@/components/Typography/PageTitle";
-import { Badge, Avatar, Button } from "@roketid/windmill-react-ui";
 import Header from '@/components/Header'
 
 import Layout from "~/containers/Layout";
 import DataTable from "~/components/DataTable";
-import { useRouter } from "next/router";
 import { RootState } from "~/store/store";
 import { toast } from "react-hot-toast";
 import { useAppDispatch, useAppSelector } from "~/hooks/appStore";
@@ -25,33 +23,26 @@ function RepoIndex() {
     page: withDefault(NumberParam, 1),
     sortBy: StringParam,
   });
-  const [sort, setSort] = useState({ sortDirection: 'none', accessor: 'some_accessor' });
+  const [sort, setSort] = useState({ direction: 'none', accessor: 'some_accessor' });
   const repos = useAppSelector<typeof reposType>(
     (state: RootState) => state.repos
   );
 
   const columnHeaderClick = async (column: any) => {
-    console.log('triggered - column', column);
-    switch (column.sortDirection) {
+    switch (sort.direction) {
       case 'none':
         setSort({ direction: 'ASC', accessor: column.id });
 
-        // const desc = await fetchUsers( 'ASC', column.id );
-        // setData(desc);
-        break;
-  
-      case 'ASC':
-        setSort({ direction: 'DESC', accessor: column.id });
-        
-        // const asc = await fetchUsers('DESC', column.id);
-        // setData(asc);
         break;
 
+      case 'ASC':
+        setSort({ direction: 'DESC', accessor: column.id });
+  
+        break;
+ 
       case 'DESC':
         setSort({ direction: 'none', accessor: column.id });
         
-        // const newData = await fetchUsers('none', column.id);
-        // setData(newData);
         break;
     }
   };
@@ -75,6 +66,7 @@ function RepoIndex() {
       {
         Header: "Name",
         accessor: "name",
+        isSorted: sort.accessor === 'name' ? true : false,
         sortType: 'basic',
         sortDirection: sort.accessor === 'name' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
@@ -92,8 +84,6 @@ function RepoIndex() {
       {
         Header: "Full Name",
         accessor: "full_name",
-        sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start justify-start gap-3">
@@ -109,8 +99,6 @@ function RepoIndex() {
       {
         Header: "URL",
         accessor: "html_url",
-        sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start">
@@ -124,8 +112,6 @@ function RepoIndex() {
       {
         Header: "Language",
         accessor: "language",
-        sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start">
@@ -139,8 +125,9 @@ function RepoIndex() {
       {
         Header: "Updated",
         accessor: "updated_at",
+        isSorted: sort.accessor === 'updated_at' ? true : false,
         sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
+        sortDirection: sort.accessor === 'updated_at' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start">
@@ -154,8 +141,6 @@ function RepoIndex() {
       {
         Header: "Pushed",
         accessor: "pushed_at",
-        sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start">
@@ -170,7 +155,8 @@ function RepoIndex() {
         Header: "Stargazers",
         accessor: "stargazers_count",
         sortType: 'basic',
-        sortDirection: sort.accessor === 'id' ? sort.direction : 'none',
+        isSorted: sort.accessor === 'stargazers_count' ? true : false,
+        sortDirection: sort.accessor === 'stargazers_count' ? sort.direction : 'none',
         Cell: ({ row: { original } }) => {
           return (
             <div className="flex flex-col items-start">
