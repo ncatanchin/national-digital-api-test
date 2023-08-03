@@ -25,9 +25,25 @@ class ReposController extends Controller
      */
     public function index(Request $request)
     {
-        $searchTerm = $request->get('q') ?? '';
+        $searchTerm = $request->get('q')
+            ? $request->get('q').' in:name'
+            : '';
 
-        $repos = $this->paginator->fetch($this->client->search(), 'repositories', [$searchTerm.' topic:php']);
+        $sortBy = json_decode($request->get('sort'));
+
+        $allowedAccessors = [
+            'name',
+            'stargazers_count',
+            'updated_at',
+        ];
+
+        $repos = $this->paginator->fetch(
+            $this->client->search(),
+            'repositories',
+            [$searchTerm.' topic:php']
+        );
+
+        $totalResults = $repos['total_count'];
 
         $repos = collect($repos['items'])
             ->map(function ($item) {
@@ -47,42 +63,13 @@ class ReposController extends Controller
 
                 return $model;
             });
-        
-        // dump($repos);
-        // exit;
+
+        if (in_array($sortBy->accessor, $allowedAccessors)) {
+            $repos = $repos->sortBy($sortBy->accessor);
+        }
+
+        $repos = $repos->paginate(20)->withQueryString();
 
         return ReposResource::collection($repos);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
