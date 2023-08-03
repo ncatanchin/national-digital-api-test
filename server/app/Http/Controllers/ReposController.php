@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReposRequest;
+use App\Http\Resources\ReposResource;
 use Github\ResultPager;
 use GrahamCampbell\GitHub\Facades\GitHub;
 use GrahamCampbell\GitHub\GitHubManager;
@@ -21,12 +23,15 @@ class ReposController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $repos = $this->paginator->fetch($this->client->search(), 'repositories', ['topic:php']);
-        $response = collect($repos['items'])
+        $searchTerm = $request->get('q') ?? '';
+
+        $repos = $this->paginator->fetch($this->client->search(), 'repositories', [$searchTerm.' topic:php']);
+
+        $repos = collect($repos['items'])
             ->map(function ($item) {
-                return collect($item)->only([
+                $repoArray = collect($item)->only([
                     'id',
                     'name',
                     'full_name',
@@ -34,12 +39,19 @@ class ReposController extends Controller
                     'language',
                     'updated_at',
                     'pushed_at',
-                    'stargazers_count,'
-                ])
-                ->toArray();
+                    'stargazers_count',
+                ])->toArray();
+
+                $model = new \App\Models\Repo();
+                $model->fill($repoArray);
+
+                return $model;
             });
         
-        return $response->toJson();
+        // dump($repos);
+        // exit;
+
+        return ReposResource::collection($repos);
     }
 
     /**
